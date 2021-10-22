@@ -1,12 +1,8 @@
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import Card from 'react-bootstrap/Card'
-import Button from 'react-bootstrap/Button'
-import Tab from 'react-bootstrap/Tab'
-import Tabs from 'react-bootstrap/Tabs'
-import ProgressBar from 'react-bootstrap/ProgressBar'
+import { useState, useEffect } from 'react';
+import { Container,
+         Nav, Navbar, NavDropdown,
+         Card, Button, Tab, Tabs, ProgressBar } from 'react-bootstrap'
+
 
 function App(){
   return (
@@ -84,7 +80,7 @@ const MyTab = () => {
     <Container>
     <Tabs defaultActiveKey="home" id="uncontrolled-tab-example" className="mb-3">
       <Tab eventKey="home" title="Home">
-      <HomeTab />
+    <HomeTab />
       </Tab>
       <Tab eventKey="profile" title="Profile">
         Another content
@@ -98,18 +94,29 @@ const MyTab = () => {
 }
 
 const HomeTab = () => {
+  const [progress, setProgress] = useState(0);
+
+  // useEffect(() => {
+    // if (progress == 100) {
+      // return
+    // }
+    // setInterval(() => {
+      // setProgress(progress => progress + 1);
+    // }, 1000)
+  // })
+
   return(
     <div>
-      <Card>
+      <Card className="text-center">
         <Card.Body>
           <Card.Title>Card Title</Card.Title>
           <Card.Subtitle className="mb-2 text-muted">Card Subtitle</Card.Subtitle>
           <Card.Text>
             Some quick example text to build on the card title and make up the bulk of
             the card's content.
-            <ProgressBar now={12} label={`${12}%`} />
+            <ProgressBar now={progress} label={`${progress}%`} />
           </Card.Text>
-          <Button variant="outline-primary" onClick={()=>console.log("test")}>Go somewhere</Button>
+          <Button variant="outline-primary" onClick={()=>console.log("test")}>Start Pulling</Button>
         </Card.Body>
       </Card>
     </div>
