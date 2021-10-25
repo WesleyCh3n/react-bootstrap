@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col,
          Nav, Navbar, NavDropdown,
          Card, Button, Tab, Tabs, ProgressBar } from 'react-bootstrap'
@@ -101,7 +101,7 @@ const CDHelper = () => {
   }
 
   const clearLogs = () => {
-
+    setLogs(logs => logs = [])
   }
 
   return (
