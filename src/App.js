@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Container,
+import { useState, useEffect, useRef } from 'react';
+import { Container, Row, Col,
          Nav, Navbar, NavDropdown,
          Card, Button, Tab, Tabs, ProgressBar } from 'react-bootstrap'
 
@@ -8,7 +8,6 @@ function App(){
   return (
     <div>
       <MyNav />
-      <MyCard />
       <MyTab />
     </div>
   );
@@ -22,9 +21,9 @@ const MyNav = () => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#features">Features</Nav.Link>
-            <Nav.Link href="#pricing">Pricing</Nav.Link>
-            <NavDropdown title="Dropdown" id="collasible-nav-dropdown">
+            <Nav.Link href="#features">Home</Nav.Link>
+            <Nav.Link href="#pricing">Status</Nav.Link>
+            <NavDropdown title="Tutorial" id="collasible-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
@@ -44,83 +43,112 @@ const MyNav = () => {
   );
 }
 
-const MyCard = () => {
-  return(
-    <Container className='py-3'>
-      <Card>
-        <Card.Header>
-          <Nav variant="pills" defaultActiveKey="#first">
-            <Nav.Item>
-              <Nav.Link href="#first">Active</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="#link">Link</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="#disabled" disabled>
-                Disabled
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Card.Header>
-        <Card.Body>
-          <Card.Title>Special title treatment</Card.Title>
-          <Card.Text>
-            With supporting text below as a natural lead-in to additional content.
-          </Card.Text>
-          <Button variant="primary">Go somewhere</Button>
-        </Card.Body>
-      </Card>
-    </Container>
-  )
-}
-
 const MyTab = () => {
   return(
     <Container>
-    <Tabs defaultActiveKey="home" id="uncontrolled-tab-example" className="mb-3">
-      <Tab eventKey="home" title="Home">
-    <HomeTab />
-      </Tab>
-      <Tab eventKey="profile" title="Profile">
-        Another content
-      </Tab>
-      <Tab eventKey="contact" title="Contact">
-        The other content
-      </Tab>
-    </Tabs>
+      <Tabs defaultActiveKey="home" id="uncontrolled-tab-example" className="mb-3">
+        <Tab eventKey="home" title="CD Helper">
+          <HomeTab />
+        </Tab>
+        <Tab eventKey="iso" title="ISO Compressor">
+          Another content
+        </Tab>
+        <Tab eventKey="history" title="History">
+          The other content
+        </Tab>
+      </Tabs>
     </Container>
   );
 }
 
 const HomeTab = () => {
-  const [progress, setProgress] = useState(0);
-
-  // useEffect(() => {
-    // if (progress == 100) {
-      // return
-    // }
-    // setInterval(() => {
-      // setProgress(progress => progress + 1);
-    // }, 1000)
-  // })
-
   return(
     <div>
-      <Card className="text-center">
-        <Card.Body>
-          <Card.Title>Card Title</Card.Title>
-          <Card.Subtitle className="mb-2 text-muted">Card Subtitle</Card.Subtitle>
-          <Card.Text>
-            Some quick example text to build on the card title and make up the bulk of
-            the card's content.
-            <ProgressBar now={progress} label={`${progress}%`} />
-          </Card.Text>
-          <Button variant="outline-primary" onClick={()=>console.log("test")}>Start Pulling</Button>
-        </Card.Body>
-      </Card>
+      <CDHelper />
     </div>
   )
 }
 
+const CDHelper = () => {
+  const [progress, setProgress] = useState(0);
+  const [btn, setBtn] = useState({disabled: false, msg: "Start"});
+  const [logs, setLogs] = useState([]);
+  const logEndRef = useRef(null)
+
+  /* emulate itense job */
+  async function sleep(ms = 0) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  const doSomeTask = async () => {
+    setProgress(progress => progress=0)
+    setBtn(btn => btn = {disabled: true, msg: "Working"})
+
+    var tasks = [1,2,3,4,5,6,7,1,1,1,1,1,1,1,1]
+    for (let i = 0, len = tasks.length; i < len; i++) {
+      // do some subprocess task
+      await sleep(1000)
+      setLogs(logs => logs = [...logs, `${i} task complete`])
+      logEndRef.current.scrollIntoView({ behavior: 'smooth' })
+      setProgress(progress => (100/tasks.length)*(i+1))
+    }
+
+    setBtn(btn => btn = {msg: "Finished"})
+    await sleep(1000)
+
+    setProgress(progress => progress=0)
+    setBtn(btn => btn = {disabled: false, msg: "Start"})
+  }
+
+  const clearLogs = () => {
+
+  }
+
+  return (
+    <Container fluid>
+      <Row>
+        <Col>
+          <Card className="text-left" md={8}>
+            <Card.Body>
+            <Card.Title>CD Helper</Card.Title>
+            <Card.Subtitle className="mb-2 text-muted">Pulling .ini driver</Card.Subtitle>
+              <Card.Text>
+              Some instruction to work with the helper
+              <ProgressBar now={progress} label={`${progress.toFixed(2)}%`} />
+              </Card.Text>
+            <Button variant="outline-primary"
+              onClick={doSomeTask}
+              disabled={btn.disabled}>
+              {btn.msg}
+            </Button>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col>
+          <Card className="text-left" md={4}>
+            <Card.Body>
+              <Card.Title>CD Helper Log</Card.Title>
+              <Card.Text
+                style={{
+                  maxHeight: '12rem',
+                  overflowY: 'auto',
+                }}>
+                {logs.map(e => (<Container>{e}</Container>))}
+                <div ref={logEndRef} />
+              </Card.Text>
+              <Card.Text>
+              </Card.Text>
+              <Button variant="outline-primary"
+                onClick={clearLogs}>
+                Clear Log
+              </Button>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
 export default App;
+                // {log.map((e)=>{<Container>e</Container>})}
